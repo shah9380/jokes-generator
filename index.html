@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Delius+Unicase&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            background: rgb(52,159,124);
+            background: linear-gradient(162deg, rgba(52,159,124,1) 100%, rgba(133,247,207,1) 100%);
+        }
+        .jokes-container{
+            background: rgba(247, 238, 133, 0.555);
+            background: linear-gradient(194deg, rgba(247,238,133,0.9024859943977591) 18%, rgba(220,227,197,1) 64%);
+            margin: 10px auto 30px auto;
+            width: 85%;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            line-height: 1.3;
+            font-family: 'Delius Unicase', 'cursive';
+            font-weight: 600;
+            border-radius: 6px;
+            color: rgb(56, 28, 27);
+            cursor: default;
+        }
+        #joke-generate-button{
+            background-color: aquamarine;
+            font-size: 18px;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            transition: background-color 0.3s ease-in-out;
+            box-shadow: 1px 1px 10px rgba(0,0,0,0.3);
+        }
+        #joke-generate-button:hover{
+            background-color: rgb(37, 255, 182);
+        }
+        #joke-generate-button:active{
+            transform: scale(0.97);
+        }
+        .img_container img{
+            width: 90%;
+            max-width: 500px;
+            display: block;
+            margin: 20px auto;
+        }
+        .hint{
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.542);
+            text-align: center;
+            margin: 60px auto 0px auto;
+        }
+        #copied{
+            text-align: center;
+            font-size: 18px;
+            background-color: rgba(0, 0, 0, 0.252);
+            display: none;
+            max-width: 300px;
+            margin: 0px auto;
+        }
+        @media screen and (min-width: 800px) {
+            .jokes-container{
+                max-width: 1200px;
+                font-size: 24px;
+                padding: 40px;
+                line-height: 1.8;
+            }
+        }   
+    </style>
+</head>
+    <body>
+        <p id="copied">Text Copied!</p>
+        <p class="hint">Click on Joke to Copy</p>
+        <div class="jokes-container">
+            <p>Look! I'm a Lion!<br>...Roar and so forth!</p>
+        </div>
+        <button id="joke-generate-button">Tell Me A Joke</button>
+        <figure class="img_container">
+            <img src="./jokes_img_png.png" alt="">
+        </figure>
+
+        <script>
+            const apiKey = `uoKhRQMzhInb1GJSAC6hLQ==RS1LwPIhiBbL82I3`;
+            let jokes_container = document.querySelector('.jokes-container')
+            const joke_generate_button = document.getElementById('joke-generate-button');
+            const copying = document.getElementById('copied');
+
+            //function to use apiKey
+
+            const options = {
+                method: 'GET',
+                headers: {
+                    'X-Api-Key': apiKey,
+                },
+            }
+            document.addEventListener('DOMContentLoaded',()=>{
+                getJoke();
+            })
+            joke_generate_button.addEventListener('click',()=>{
+                getJoke();
+            });
+            const loadingArray = [
+                'Unpacking dad jokes... Handle with extreme laughter!',
+                'Gathering puns and dad wisdom... Brace yourself!',
+                "Summoning dad-level humor... It's loading slower than a dad joke at a family dinner.",
+                "Brewing the perfect dad joke... It's like waiting for your dad to finish a story.",
+                'Loading giggles... Warning: may cause uncontrollable laughter.',
+                "Spinning the dad joke generator wheel... Hope you're ready for a dad-tastic time!",
+                'Assembling dad jokes... This might take longer than a dad taking forever in a hardware store.',
+                "Downloading dad jokes... Your patience is appreciated, unlike a dad's dance moves.",
+                'Generating dad-approved humor... Please stand by for dad-level wit.',
+                "Preparing a fresh batch of dad jokes... Don't worry, it's not as long as a dad's grocery list.",
+            ]
+            //to get the joke from api
+            async function getJoke(){
+                let msg = loadingArray[Math.floor(Math.random()*loadingArray.length)];
+                jokes_container.innerHTML = msg;
+                try{
+                    joke_generate_button.disable = true;
+                    joke_generate_button.style.opacity = 0.4;
+                    const  apiUrl = 'https://api.api-ninjas.com/v1/dadjokes?limit=1';
+                    const response = await fetch(apiUrl, options);
+                    const dataArray = await response.json();
+                    dataArray.map((data)=>{
+                        const myJoke = document.createElement('p');
+                        myJoke.innerText = `${data.joke}`;
+                        jokes_container.innerHTML = "";
+                        jokes_container.appendChild(myJoke);
+                        joke_generate_button.disable = false;
+                        joke_generate_button.style.opacity = 1;
+                    })
+                }
+                catch(err){
+                    console.log(err);
+                }
+            }
+
+            const copyText = () => {
+	            navigator.clipboard.writeText(jokes_container.textContent);
+            }
+            jokes_container.addEventListener('click',()=>{
+                copyText();
+                copying.style.display='block';
+                setTimeout(()=>{
+                    copying.style.display='none';
+                },1_000);
+            });
+            
+        </script>
+</body>
+</html>
